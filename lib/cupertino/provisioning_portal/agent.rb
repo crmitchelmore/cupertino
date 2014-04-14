@@ -260,23 +260,15 @@ module Cupertino
 
           
           form = page.form_with(:name => 'bundleSave') or raise UnexpectedContentError
-
           form.field_with(:name => "appIdName").value = app_id.description
           form.field_with(:name => "explicitIdentifier").value = app_id.bundle_seed_id
-          form.method = 'GET'
           form.checkbox_with(:name => "push").check()
-
-
-          oldform = form
-
+          form.add_field!("appIdentifierString",app_id.bundle_seed_id)
+          form.add_field!("formID", "#{rand 10000000}")
+          form.add_field!("clientToken", "undefined")
+          form.method = 'POST'
+          form.action = "https://developer.apple.com/account/ios/identifiers/bundle/bundleConfirm.action"
           form.submit
-
-          oldform.method = 'POST'
-          oldform.add_field!("appIdentifierString",app_id.bundle_seed_id)
-          oldform.add_field!("formID", "#{rand 10000000}")
-          oldform.add_field!("clientToken", "undefined")
-          oldform.action = "https://developer.apple.com/account/ios/identifiers/bundle/bundleConfirm.action"
-          oldform.submit
 
          if form = page.form_with(:name => 'bundleSubmit')
 
@@ -287,6 +279,7 @@ module Cupertino
            form.add_field!("inAppPurchase", "on")
            form.add_field!("gameCenter", "on")
            form.add_field!("push", "on")
+
            form.add_field!("explicitIdentifier",app_id.bundle_seed_id)
            form.add_field!("appIdentifierString",app_id.bundle_seed_id)
            form.add_field!("appIdName", app_id.description)
